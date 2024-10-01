@@ -3,11 +3,16 @@ from decouple import config
 from supabase import create_client, Client
 from pydantic import BaseModel
 from typing import List
+from fastapi.middleware.cors import CORSMiddleware
 
 url = config("SUPABASE_URL")
 key = config("SUPABASE_KEY")
 
 app = FastAPI()
+frontend_url = "http://localhost:3000"
+origins = [frontend_url]
+app.add_middleware(CORSMiddleware, allow_origins=origins,allow_methods=["*"])
+
 supabase: Client = create_client(url, key)
 
 @app.get("/moments")
