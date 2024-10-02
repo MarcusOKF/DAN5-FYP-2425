@@ -5,7 +5,7 @@
 | Name | SID |
 | ----------- | ----------- |
 | ON, Ka Fung | 20773548 |
-| CHAN, Kwun Chi | 00000000 |
+| CHAN, Kwun Chi | 20768945 |
 | KUMAR, Ayush | 00000000 |
 
 ## Backend related
@@ -14,7 +14,7 @@
 1. `cd backend` to go into backend directory
 2. `python3 -m venv venv` to create virtual environment (may be different for Windows)
 3. `source venv/bin/activate` to activate virtual environment
-4. `pip install requirements.txt` to install all packages currently used
+4. `pip install -r requirements.txt` to install all packages currently used
 
 ### Open FastAPI docs in browser
 1. `uvicorn main:app --reload` 
