@@ -4,10 +4,14 @@ from decouple import config
 from pydantic import BaseModel
 from typing import List
 from fastapi.middleware.cors import CORSMiddleware
+import uuid
+import secrets
+import torch
 
 # modules
 from databaseClient import supabase
 from databaseModels import Moment
+from models.CLIP.CLIP import vectorizeTextCLIP, vectorizeFrameCLIP
 
 # Init FastAPI server
 app = FastAPI()
@@ -37,27 +41,24 @@ def get_videos():
 
 
 ################################## POST ##################################
-@app.post("/vectorize/{video_name}", status_code=status.HTTP_201_CREATED)
-def vectorize(video_name: str):
-    video_path = f'{CDNURL}/{video_name}'
+@app.post("/vectorize/{name}", status_code=status.HTTP_201_CREATED)
+def vectorize(name: str):
+    path = f'{CDNURL}/{name}'
 
+    frame_vector = vectorizeFrameCLIP(path).tolist()[0]
 
-    return video_path
-    # moment = supabase.table("moment").insert({
-    #     "id": id,
-    #     "video_name": moment.video_name,
-    #     "time_start": moment.time_start,
-    #     "time_end": moment.time_end,
-    #     "embedding": moment.embedding,
-    #     "audio_embedding": moment.audio_embedding
-    # }).execute()
-    # return moment
+    frame = supabase.table("frame").insert({
+        "id": secrets.randbelow(10**8),
+        "video_name": name,
+        "timestamp": 0.0,
+        "embedding": frame_vector,
+    }).execute()
+    return frame
 
 @app.post("/moments", status_code=status.HTTP_201_CREATED)
 def create_moment(moment: Moment):
-    id = 4
     moment = supabase.table("moment").insert({
-        "id": id,
+        "id": secrets.randbelow(10**8),
         "video_name": moment.video_name,
         "time_start": moment.time_start,
         "time_end": moment.time_end,
