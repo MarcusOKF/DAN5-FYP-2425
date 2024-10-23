@@ -7,11 +7,13 @@ from fastapi.middleware.cors import CORSMiddleware
 import uuid
 import secrets
 import torch
+import json
 
 # modules
 from databaseClient import supabase
 from databaseModels import Moment
-from models.CLIP.CLIP import vectorizeTextCLIP, vectorizeFrameCLIP
+from models.CLIP.CLIP import vectoriz_text_CLIP, vectorize_frame_CLIP, batch_vectorize_frames_CLIP
+from frame_extractor import extract_frames_from_video_path
 
 # Init FastAPI server
 app = FastAPI()
@@ -45,15 +47,27 @@ def get_videos():
 def vectorize(name: str):
     path = f'{CDNURL}/{name}'
 
-    frame_vector = vectorizeFrameCLIP(path).tolist()[0]
+    frames = extract_frames_from_video_path(path, 2) # frames = [{timestamp: float, image: ndarray}]
 
-    frame = supabase.table("frame").insert({
-        "id": secrets.randbelow(10**8),
-        "video_name": name,
-        "timestamp": 0.0,
-        "embedding": frame_vector,
-    }).execute()
-    return frame
+    frames_rbg_vals = list(map(lambda f: f["image"], frames))
+
+    frame_vectors = batch_vectorize_frames_CLIP(frames_rbg_vals)
+
+    # Map all the info to a database model
+    for i in range(len(frames)):
+        frames[i] = {
+            "id": secrets.randbelow(10**8),
+            "video_name": name,
+            "timestamp": frames[i]["timestamp"],
+            "embedding": frame_vectors[i].tolist(),
+        }
+
+    supabase.table("frame").insert(frames).execute()
+
+    print(frames[3])
+
+    return "OK"
+ 
 
 @app.post("/moments", status_code=status.HTTP_201_CREATED)
 def create_moment(moment: Moment):

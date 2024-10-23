@@ -39,9 +39,9 @@ function App() {
     setLoading(false)
   }
 
-  const vectorizeFrame = async (e) => {
+  const vectorizeVideo = async (e) => {
     // Currently hardcode
-    const name = `dog.jpg`
+    const name = `cba080da-405a-4dca-a956-e5189caf89b0.mp4`
     const response = await api.post(`/vectorize/${name}`)
     const data = response.data
     console.log(data)
@@ -73,7 +73,7 @@ function App() {
 
           <br></br>
           <label id="upload-btn">Action handler to vectorize a frame (not video) given frame name. The same name as stored in the Bucket</label>
-          <button onClick={(e) => vectorizeFrame(e)}>Vectorize Video</button>
+          <button onClick={(e) => vectorizeVideo(e)}>Vectorize Video</button>
             
           </div>
 
