@@ -87,3 +87,4 @@ def create_moment(moment: Moment):
 def del_moment(id: int):
     moment = supabase.table("moment").delete().eq("id", id).execute()
     return {"msg": "deleted"}
+
